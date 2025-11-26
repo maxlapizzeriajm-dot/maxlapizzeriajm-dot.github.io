@@ -1,0 +1,141 @@
+<div id="bannerBadgeWrapper">
+  <div id="pizzaBadge">
+    <div class="badge-circle">
+      <svg class="curve-top" viewBox="0 0 120 120">
+        <defs>
+          <path id="topArc" d="M 12 60 A 48 48 0 0 1 108 60" />
+        </defs>
+        <text font-size="12" fill="white" font-weight="bold">
+          <textPath href="#topArc" startOffset="50%" text-anchor="middle">PIZZA</textPath>
+        </text>
+      </svg>
+
+      <div class="badge-number">
+        <div class="number-wrapper">
+          <span class="fire">🔥</span>
+          <span id="pizzaTotal">0</span>
+          <span class="fire">🔥</span>
+        </div>
+      </div>
+
+      <svg class="curve-bottom" viewBox="0 0 120 120">
+        <defs>
+          <path id="bottomArc" d="M 12 60 A 48 48 0 0 0 108 60" />
+        </defs>
+        <text font-size="12" fill="white" font-weight="bold">
+          <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">METER</textPath>
+        </text>
+      </text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+const webAppURL = "https://script.google.com/macros/s/AKfycbz144eYshhEIfEqemLkwE-Ojhr7ZIiOadCEPiBcE5_vuZPtsxeo4-AOAUzbWLHv2oJ7uA/exec"; // Apps Script Web App URL
+
+async function updatePizzaTotal() {
+  try {
+    const res = await fetch(webAppURL);
+    const data = await res.json();
+    const totalEl = document.getElementById("pizzaTotal");
+    totalEl.innerText = data.total;
+
+    const badge = document.getElementById("pizzaBadge");
+    const wrapper = totalEl.parentElement;
+    const badgeWidth = badge.offsetWidth;
+    let fontSizePx = badgeWidth * 0.35;
+    if (data.total.toString().length === 3) fontSizePx = badgeWidth * 0.28;
+    if (data.total.toString().length === 4) fontSizePx = badgeWidth * 0.22;
+    if (data.total.toString().length >= 5) fontSizePx = badgeWidth * 0.18;
+    wrapper.style.fontSize = fontSizePx + "px";
+
+  } catch(e) {
+    console.log("Error fetching pizza total:", e);
+  }
+}
+
+// Update every 10 seconds
+setInterval(updatePizzaTotal, 10000);
+updatePizzaTotal();
+</script>
+
+<style>
+#bannerBadgeWrapper { position: relative; }
+
+#pizzaBadge {
+  position: absolute;
+  top: -5%;
+  right: 2%;
+  width: 45%;
+  aspect-ratio: 1;
+  z-index: 10;
+  transform: rotate(-10deg);
+  animation: floatSine 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes floatSine {
+  0% { transform: rotate(-10deg) translateX(0%); }
+  25% { transform: rotate(-10deg) translateX(-3%); }
+  50% { transform: rotate(-10deg) translateX(0%); }
+  75% { transform: rotate(-10deg) translateX(3%); }
+  100% { transform: rotate(-10deg) translateX(0%); }
+}
+
+.badge-circle {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, #111 40%, #000 100%);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.7), inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.badge-circle::before {
+  content: '';
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #00FF00, #007A00);
+  z-index: -1;
+}
+
+.curve-top, .curve-bottom { position: absolute; width: 100%; height: 100%; left: 0; }
+.curve-top { top: 5%; }
+.curve-bottom { bottom: 0%; }
+
+.badge-number {
+  position: relative;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+.number-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5%;
+  color: red;
+  font-weight: 900;
+  text-shadow: 0 0 3px #FF2A2A, 0 0 5px #FF5555;
+  white-space: nowrap;
+  transition: font-size 0.5s ease-in-out;
+}
+
+.number-wrapper .fire { display: inline-block; }
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) { #pizzaBadge { width: 30%; top: -3%; right: 2%; } }
+@media (max-width: 480px) { #pizzaBadge { width: 25%; top: -2%; right: 2%; } }
+</style>
